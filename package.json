@@ -1,0 +1,1 @@
+{"dependencies":{"express":"^4.19.2","socket.io":"^4.7.5"},"description":"Ứng dụng chat thời gian thực phong cách Yahoo Messenger hồi xưa - chat phòng + chat riêng + BUZZ","engines":{"node":">=18"},"main":"server.js","name":"yahoo-chat-hoi-xua","scripts":{"start":"node server.js"},"version":"1.0.0"}
