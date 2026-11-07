@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yahoo! Chat Hồi Xưa — Chat với bạn bè</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#6a1b9a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Y! Chat Xưa">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icons/icon-192.png">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Tahoma, Verdana, Arial, sans-serif; font-size: 13px; min-height: 100vh;
+    background: radial-gradient(1200px 600px at 20% 0%, #7b1fa2 0%, transparent 60%),
+                linear-gradient(160deg, #2a0a4a 0%, #4a148c 45%, #12002f 100%); color: #222; }
+  .win { background: #ece9d8; border: 2px solid #3b1163; border-radius: 8px 8px 4px 4px; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,.55); display: flex; flex-direction: column; }
+  .titlebar { background: linear-gradient(180deg, #9c4dcc, #6a1b9a 55%, #4a148c); color: #fff; padding: 6px 8px;
+    display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 12px; user-select: none; }
+  .titlebar .tbtns { margin-left: auto; display: flex; gap: 3px; }
+  .tbtn { width: 20px; height: 18px; border: 1px solid rgba(255,255,255,.6); border-radius: 3px; background: rgba(255,255,255,.15);
+    color: #fff; font-size: 11px; line-height: 16px; text-align: center; cursor: pointer; }
+  .tbtn.close { background: #c62828; }
+  .btn { background: linear-gradient(180deg, #fff, #d9d2b8); border: 1px solid #7f7a68; border-radius: 4px;
+    padding: 5px 12px; cursor: pointer; font-family: inherit; font-size: 12px; }
+  .btn:hover { filter: brightness(1.05); }
+  .btn.primary { background: linear-gradient(180deg, #ab47bc, #7b1fa2); color: #fff; border-color: #4a148c; font-weight: bold; }
+  .btn.buzz { background: linear-gradient(180deg, #ffecb3, #ffb300); border-color: #a66a00; font-weight: bold; color: #5d3800; }
+  input[type=text], select { font-family: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid #9e9a8a; border-radius: 3px; background: #fff; }
+  /* Màn hình đăng nhập */
+  #loginWrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  #loginWin { width: 380px; max-width: 94vw; }
+  .loginBody { padding: 18px; background: linear-gradient(180deg, #f3e5f5, #ece9d8 60%); }
+  .logo { text-align: center; margin-bottom: 10px; }
+  .logo .y { font-size: 34px; font-weight: 900; color: #7b1fa2; letter-spacing: -1px; font-family: Arial Black, Arial; }
+  .logo .y span { color: #f9a825; }
+  .logo .sub { color: #6a1b9a; font-style: italic; font-size: 12px; margin-top: 2px; }
+  .frow { margin: 10px 0; }
+  .frow label { display: block; font-size: 12px; color: #444; margin-bottom: 4px; }
+  .frow input, .frow select { width: 100%; }
+  .avatars { display: flex; gap: 6px; flex-wrap: wrap; }
+  .avatars button { font-size: 20px; width: 40px; height: 40px; border-radius: 50%; border: 2px solid transparent; background: #fff; cursor: pointer; }
+  .avatars button.sel { border-color: #7b1fa2; background: #f3e5f5; }
+  .hint { font-size: 11px; color: #666; text-align: center; margin-top: 10px; line-height: 1.5; }
+  /* Màn hình chính */
+  #app { display: none; height: 100vh; padding: 12px; gap: 12px; }
+  #messenger { width: 320px; flex: none; max-height: calc(100vh - 24px); }
+  .myhead { padding: 10px; background: linear-gradient(180deg, #f3e5f5, #e1bee7); border-bottom: 1px solid #b39ddb; }
+  .myrow { display: flex; gap: 8px; align-items: center; }
+  .myava { font-size: 30px; background: #fff; border: 2px solid #7b1fa2; border-radius: 6px; width: 46px; height: 46px; text-align: center; line-height: 42px; }
+  .mynick { font-weight: bold; color: #4a148c; font-size: 15px; }
+  .section { padding: 8px 10px 4px; font-weight: bold; color: #4a148c; font-size: 12px; display: flex; justify-content: space-between; }
+  .list { overflow-y: auto; padding: 0 6px 8px; }
+  .buddy, .room { display: flex; gap: 8px; align-items: center; padding: 6px; border-radius: 4px; cursor: pointer; position: relative; }
+  .buddy:hover, .room:hover { background: #d1c4e9; }
+  .buddy .ava { font-size: 18px; }
+  .buddy .nm { font-weight: bold; color: #1565c0; }
+  .buddy.me .nm { color: #4a148c; }
+  .buddy .sm, .room .sm { font-size: 11px; color: #666; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .dot.available { background: #43a047; } .dot.busy { background: #e53935; } .dot.away { background: #fb8c00; }
+  .badge { position: absolute; right: 8px; top: 8px; background: #d81b60; color: #fff; font-size: 10px; border-radius: 9px; padding: 1px 6px; font-weight: bold; }
+  #chatArea { flex: 1; display: flex; flex-wrap: wrap; gap: 12px; align-content: flex-start; overflow-y: auto; }
+  .chatwin { width: 430px; max-width: 100%; height: 480px; max-height: calc(100vh - 24px); }
+  .msgs { flex: 1; overflow-y: auto; background: #fff; padding: 8px; line-height: 1.45; }
+  .msg { margin-bottom: 6px; word-wrap: break-word; }
+  .msg .who { font-weight: bold; }
+  .msg .who.me { color: #7b1fa2; } .msg .who.other { color: #1565c0; }
+  .msg .time { color: #999; font-size: 10px; margin-left: 4px; }
+  .msg.sys { color: #888; font-style: italic; font-size: 12px; text-align: center; }
+  .msg.buzzmsg { color: #b26a00; font-weight: bold; text-align: center; }
+  .typing { height: 16px; font-size: 11px; color: #777; font-style: italic; padding: 0 8px; background: #fff; }
+  .toolbar { display: flex; gap: 4px; padding: 5px; background: #e8e2c9; border-top: 1px solid #c9c3a5; align-items: center; flex-wrap: wrap; }
+  .toolbar .ticon { cursor: pointer; font-size: 16px; padding: 2px 5px; border-radius: 3px; }
+  .toolbar .ticon:hover { background: #d1c4e9; }
+  .composer { display: flex; gap: 5px; padding: 6px; background: #ece9d8; }
+  .composer input { flex: 1; }
+  .emopicker { display: none; padding: 6px; background: #fff; border-top: 1px solid #ccc; flex-wrap: wrap; gap: 2px; }
+  .emopicker.open { display: flex; }
+  .emopicker span { font-size: 19px; cursor: pointer; padding: 2px; }
+  @keyframes shake { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-8px,3px)} 20%{transform:translate(7px,-4px)}
+    30%{transform:translate(-6px,-3px)} 40%{transform:translate(6px,4px)} 50%{transform:translate(-5px,2px)}
+    60%{transform:translate(5px,-2px)} 70%{transform:translate(-4px,1px)} 80%{transform:translate(4px,-1px)} 90%{transform:translate(-2px,0)} }
+  .shaking { animation: shake .6s ease-in-out 2; }
+  .emptyNote { color: #e1bee7; text-align: center; margin: auto; font-size: 15px; line-height: 1.7; padding: 20px; }
+  @media (max-width: 760px) { #app { flex-direction: column; height: auto; } #messenger { width: 100%; max-height: 46vh; } .chatwin { width: 100%; height: 62vh; } }
+</style>
+</head>
+<body>
+
+<div id="loginWrap">
+  <div class="win" id="loginWin">
+    <div class="titlebar">🟣 Yahoo! Messenger <div class="tbtns"><div class="tbtn">_</div><div class="tbtn">□</div><div class="tbtn close">×</div></div></div>
+    <div class="loginBody">
+      <div class="logo"><div class="y">YAHOO<span>!</span></div><div class="sub">Messenger ~ bản hồi xưa, chat thật với bạn bè ~</div></div>
+      <div class="frow"><label>Yahoo! ID (nick chat của bạn)</label><input type="text" id="nickInput" maxlength="24" placeholder="vd: tex_dep_trai_2008"></div>
+      <div class="frow"><label>Chọn avatar</label><div class="avatars" id="avatarPick"></div></div>
+      <div class="frow"><label>Trạng thái</label>
+        <select id="statusInput"><option value="available">🟢 Available — Đang online</option><option value="busy">🔴 Busy — Bận</option><option value="away">🟠 Away — Vắng mặt</option></select></div>
+      <div class="frow"><label>Dòng trạng thái (status message)</label><input type="text" id="statusMsgInput" maxlength="60" placeholder="vd: Đang nghe nhạc xưa, đừng BUZZ :)"></div>
+      <button class="btn primary" id="signInBtn" style="width:100%; padding:9px;">Sign In</button>
+      <div class="hint">Không cần mật khẩu, không cần tài khoản.<br>Gửi link trang này cho bạn bè, ai vào cũng thấy nhau trong Buddy List.</div>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="win" id="messenger">
+    <div class="titlebar">🟣 Yahoo! Messenger <div class="tbtns"><div class="tbtn">_</div><div class="tbtn">□</div><div class="tbtn close">×</div></div></div>
+    <div class="myhead">
+      <div class="myrow"><div class="myava" id="myAva">😊</div>
+        <div style="flex:1;"><div class="mynick" id="myNick">...</div>
+        <select id="myStatus" style="width:100%; margin-top:3px; padding:3px;">
+          <option value="available">🟢 Available</option><option value="busy">🔴 Busy</option><option value="away">🟠 Away</option></select></div>
+      </div>
+      <input type="text" id="myStatusMsg" maxlength="60" style="width:100%; margin-top:7px;" placeholder="Gõ dòng trạng thái của bạn...">
+    </div>
+    <div style="overflow-y:auto;">
+      <div class="section">💬 PHÒNG CHAT</div>
+      <div class="list" id="roomList" style="overflow:visible;"></div>
+      <div class="section">👥 BẠN BÈ ONLINE <span id="onlineCount"></span></div>
+      <div class="list" id="buddyList" style="overflow:visible;"></div>
+      <div style="padding:8px 10px 0;"><button class="btn primary" id="installBtn" style="width:100%;">📲 Cài thành app trên điện thoại</button></div>
+      <div style="padding:8px 10px; font-size:11px; color:#777;">Nhấp đúp vào tên bạn để mở cửa sổ chat riêng. Nút BUZZ!!! nằm trong cửa sổ chat.</div>
+    </div>
+  </div>
+  <div id="chatArea"><div class="emptyNote">👈 Chọn một phòng chat ở cột trái,<br>hoặc nhấp đúp vào tên một người bạn để bắt đầu tám chuyện.<br><br>Nhớ thử nút <b style="color:#ffb300;">BUZZ!!!</b> huyền thoại nhé!</div></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const EMOS = { ':)':'😊', ':-)':'😊', ':(':'😞', ':D':'😄', ';)':'😉', ':P':'😛', ':p':'😛', ':o':'😮', ':O':'😮', '<3':'❤️', ':*':'😘', ":'(":'😢', 'B-)':'😎', ':|':'😐', '>:(':'😠', '^^':'😆' };
+const PICKER = ['😊','😄','😂','😉','😛','😮','😢','😎','😘','❤️','👍','🎵','☕','🌟','🔥','😴'];
+const AVATARS = ['😊','😎','🥰','😺','🐶','🦊','🐼','🤠','👻','🌸'];
+let myNick = '', myAvatar = localStorage.getItem('yahoo_avatar') || '😊';
+let users = [], rooms = [];
+const windows = new Map(); // key: 'room:<id>' | 'pm:<nick>' -> {el, msgs, typingEl, input}
+const unread = new Map();
+const socket = io();
+
+// ---------- âm thanh ----------
+let audioCtx = null;
+function beep(freq, dur, type='sine', gain=0.06) {
+  try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq; g.gain.value = gain;
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+const ding = () => { beep(880, .12); setTimeout(() => beep(1320, .15), 110); };
+const buzzSound = () => beep(140, .5, 'sawtooth', .09);
+
+// ---------- đăng nhập ----------
+const pick = document.getElementById('avatarPick');
+AVATARS.forEach(a => { const b = document.createElement('button'); b.textContent = a; if (a === myAvatar) b.className = 'sel';
+  b.onclick = () => { myAvatar = a; localStorage.setItem('yahoo_avatar', a); pick.querySelectorAll('button').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); };
+  pick.appendChild(b); });
+document.getElementById('nickInput').value = localStorage.getItem('yahoo_nick') || '';
+function signIn() {
+  const nick = document.getElementById('nickInput').value.trim();
+  if (!nick) { alert('Bạn chưa gõ Yahoo! ID kìa :)'); return; }
+  localStorage.setItem('yahoo_nick', nick);
+  socket.emit('join', { nick, avatar: myAvatar, status: document.getElementById('statusInput').value,
+    statusMsg: document.getElementById('statusMsgInput').value.trim() }, (res) => {
+    if (!res || !res.ok) return;
+    myNick = res.nick;
+    document.getElementById('myNick').textContent = myNick;
+    document.getElementById('myAva').textContent = myAvatar;
+    document.getElementById('myStatus').value = document.getElementById('statusInput').value;
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    openWindow('room', rooms[0] ? rooms[0].id : 'viet-nam', rooms[0] ? rooms[0].name : 'Phòng Việt Nam');
+  });
+}
+document.getElementById('signInBtn').onclick = signIn;
+document.getElementById('nickInput').addEventListener('keydown', e => { if (e.key === 'Enter') signIn(); });
+document.getElementById('myStatus').onchange = e => socket.emit('set_status', { status: e.target.value });
+document.getElementById('myStatusMsg').onchange = e => socket.emit('set_status', { statusMsg: e.target.value });
+
+// ---------- danh sách ----------
+socket.on('rooms', list => { rooms = list; renderRooms(); });
+socket.on('users', list => { users = list; renderBuddies(); });
+socket.on('system', d => { windows.forEach(w => addSys(w, d.text)); });
+
+function renderRooms() {
+  const el = document.getElementById('roomList'); el.innerHTML = '';
+  rooms.forEach(r => { const d = document.createElement('div'); d.className = 'room';
+    d.innerHTML = '<span style="font-size:17px;">🏠</span><div><div class="nm" style="font-weight:bold;color:#6a1b9a;">' + r.name + '</div><div class="sm">' + r.desc + '</div></div>';
+    const bd = unreadBadge('room:' + r.id); if (bd) d.appendChild(bd);
+    d.onclick = () => openWindow('room', r.id, r.name); el.appendChild(d); });
+}
+function renderBuddies() {
+  const el = document.getElementById('buddyList'); el.innerHTML = '';
+  document.getElementById('onlineCount').textContent = '(' + users.length + ')';
+  users.forEach(u => { const d = document.createElement('div'); d.className = 'buddy' + (u.nick === myNick ? ' me' : '');
+    d.innerHTML = '<span class="dot ' + u.status + '"></span><span class="ava">' + u.avatar + '</span><div><div class="nm">' +
+      u.nick + (u.nick === myNick ? ' (bạn)' : '') + '</div>' + (u.statusMsg ? '<div class="sm">' + u.statusMsg + '</div>' : '') + '</div>';
+    const bd = unreadBadge('pm:' + u.nick); if (bd) d.appendChild(bd);
+    if (u.nick !== myNick) d.ondblclick = () => openWindow('pm', u.nick, u.nick);
+    el.appendChild(d); });
+}
+function unreadBadge(key) { const n = unread.get(key) || 0; if (!n) return null;
+  const b = document.createElement('span'); b.className = 'badge'; b.textContent = n; return b; }
+
+// ---------- cửa sổ chat ----------
+function fmt(text) { let t = text; Object.keys(EMOS).sort((a,b) => b.length - a.length).forEach(k => { t = t.split(k).join(EMOS[k]); }); return t; }
+function timeStr(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+
+function openWindow(type, id, title) {
+  const key = type + ':' + id;
+  if (windows.has(key)) { windows.get(key).el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); clearUnread(key); return; }
+  const empty = document.querySelector('.emptyNote'); if (empty) empty.remove();
+  const win = document.createElement('div'); win.className = 'win chatwin';
+  win.innerHTML =
+    '<div class="titlebar">' + (type === 'room' ? '🏠 ' : '💬 ') + '<span></span><div class="tbtns"><div class="tbtn">_</div><div class="tbtn close">×</div></div></div>' +
+    '<div class="msgs"></div><div class="typing"></div>' +
+    '<div class="emopicker"></div>' +
+    '<div class="toolbar"><span class="ticon emoBtn" title="Emoticon">😊</span><span class="ticon" title="Audible">🎵</span>' +
+    '<button class="btn buzz" style="margin-left:auto;">BUZZ!!!</button></div>' +
+    '<div class="composer"><input type="text" placeholder="Gõ tin nhắn... :) là cười, <3 là tim" maxlength="1000"><button class="btn primary">Send</button></div>';
+  win.querySelector('.titlebar span').textContent = title;
+  document.getElementById('chatArea').appendChild(win);
+  const w = { el: win, msgs: win.querySelector('.msgs'), typingEl: win.querySelector('.typing'), input: win.querySelector('input'), type, id, typingTimer: null };
+  windows.set(key, w);
+  win.querySelector('.close').onclick = () => { windows.delete(key); win.remove(); };
+  const picker = win.querySelector('.emopicker');
+  PICKER.forEach(e => { const s = document.createElement('span'); s.textContent = e; s.onclick = () => { w.input.value += e; w.input.focus(); }; picker.appendChild(s); });
+  win.querySelector('.emoBtn').onclick = () => picker.classList.toggle('open');
+  const send = () => { const text = w.input.value.trim(); if (!text) return; w.input.value = '';
+    socket.emit('typing', { room: type === 'room' ? id : undefined, to: type === 'pm' ? id : undefined, typing: false });
+    if (type === 'room') socket.emit('room_message', { room: id, text }); else socket.emit('private_message', { to: id, text }); };
+  win.querySelector('.composer .btn').onclick = send;
+  w.input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  w.input.addEventListener('input', () => { socket.emit('typing', { room: type === 'room' ? id : undefined, to: type === 'pm' ? id : undefined, typing: true });
+    clearTimeout(w.typingPeerTimer); });
+  win.querySelector('.buzz').onclick = () => { socket.emit('buzz', type === 'room' ? { room: id } : { to: id }); doBuzz(w, myNick); };
+  w.input.focus(); clearUnread(key);
+}
+function clearUnread(key) { unread.delete(key); renderBuddies(); renderRooms(); }
+function bumpUnread(key) { unread.set(key, (unread.get(key) || 0) + 1); renderBuddies(); renderRooms(); }
+function addMsg(w, m) { const d = document.createElement('div'); d.className = 'msg';
+  d.innerHTML = '<span class="who ' + (m.from === myNick ? 'me' : 'other') + '"></span><span class="time"></span>: <span class="txt"></span>';
+  d.querySelector('.who').textContent = m.avatar + ' ' + m.from; d.querySelector('.time').textContent = '(' + timeStr(m.time) + ')';
+  d.querySelector('.txt').textContent = fmt(m.text); w.msgs.appendChild(d); w.msgs.scrollTop = w.msgs.scrollHeight; }
+function addSys(w, text) { const d = document.createElement('div'); d.className = 'msg sys'; d.textContent = text; w.msgs.appendChild(d); w.msgs.scrollTop = w.msgs.scrollHeight; }
+function addBuzzMsg(w, from) { const d = document.createElement('div'); d.className = 'msg buzzmsg'; d.textContent = '⚡ ' + from + ' vừa gửi BUZZ!!! ⚡'; w.msgs.appendChild(d); w.msgs.scrollTop = w.msgs.scrollHeight; }
+function doBuzz(w, from) { addBuzzMsg(w, from); w.el.classList.remove('shaking'); void w.el.offsetWidth; w.el.classList.add('shaking'); buzzSound(); }
+
+// ---------- nhận sự kiện ----------
+socket.on('history', d => { const w = windows.get('room:' + d.room); if (w && !w.msgs.children.length) d.messages.forEach(m => addMsg(w, m)); });
+socket.on('room_message', m => { const key = 'room:' + m.room; let w = windows.get(key);
+  if (!w) { if (m.from !== myNick) bumpUnread(key); return; }
+  addMsg(w, m); if (m.from !== myNick) ding(); });
+socket.on('private_message', m => { const peer = m.from === myNick ? m.to : m.from; const key = 'pm:' + peer; let w = windows.get(key);
+  if (!w) { if (m.from !== myNick) { bumpUnread(key); ding(); } return; }
+  addMsg(w, m); if (m.from !== myNick) ding(); });
+socket.on('buzz', d => { let w = null;
+  if (d.room) w = windows.get('room:' + d.room);
+  else { const peer = d.self ? d.to : d.from; w = windows.get('pm:' + peer); if (!w && !d.self) { bumpUnread('pm:' + d.from); } }
+  if (w && !d.self) doBuzz(w, d.from); else if (w && d.self) { /* mình tự buzz: đã rung lúc bấm */ } });
+socket.on('typing', d => { let w = null;
+  if (d.room) w = windows.get('room:' + d.room); else if (d.from) w = windows.get('pm:' + d.from);
+  if (!w) return; w.typingEl.textContent = d.typing ? d.from + ' đang gõ...' : '';
+  if (d.typing) { clearTimeout(w._tt); w._tt = setTimeout(() => w.typingEl.textContent = '', 2500); } });
+
+// ---------- cài như app (PWA) ----------
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
+document.getElementById('installBtn').onclick = async () => {
+  if (deferredInstall) { deferredInstall.prompt(); await deferredInstall.userChoice; deferredInstall = null; return; }
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (isIOS) alert('Trên iPhone: bấm nút Chia sẻ (Share) ở dưới Safari → chọn "Thêm vào Màn hình chính" (Add to Home Screen) là có app Y! Chat Xưa ngoài màn hình.');
+  else if (window.matchMedia('(display-mode: standalone)').matches) alert('Bạn đang mở bằng app đã cài rồi đó :)');
+  else alert('Trên Android/Chrome: bấm menu ⋮ ở góc phải trình duyệt → chọn "Cài ứng dụng" (Install app) hoặc "Thêm vào Màn hình chính".');
+};
+</script>
+</body>
+</html>
