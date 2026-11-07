@@ -82,6 +82,9 @@
   .emopicker { display: none; padding: 6px; background: #fff; border-top: 1px solid #ccc; flex-wrap: wrap; gap: 2px; }
   .emopicker.open { display: flex; }
   .emopicker span { font-size: 19px; cursor: pointer; padding: 2px; }
+  .emopicker img { width: 30px; height: 30px; cursor: pointer; padding: 2px; border-radius: 4px; }
+  .emopicker img:hover { background: #d1c4e9; }
+  .msg .txt img.emo { width: 22px; height: 22px; vertical-align: -5px; }
   @keyframes shake { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-8px,3px)} 20%{transform:translate(7px,-4px)}
     30%{transform:translate(-6px,-3px)} 40%{transform:translate(6px,4px)} 50%{transform:translate(-5px,2px)}
     60%{transform:translate(5px,-2px)} 70%{transform:translate(-4px,1px)} 80%{transform:translate(4px,-1px)} 90%{transform:translate(-2px,0)} }
@@ -135,6 +138,11 @@
 <script>
 const EMOS = { ':)':'😊', ':-)':'😊', ':(':'😞', ':D':'😄', ';)':'😉', ':P':'😛', ':p':'😛', ':o':'😮', ':O':'😮', '<3':'❤️', ':*':'😘', ":'(":'😢', 'B-)':'😎', ':|':'😐', '>:(':'😠', '^^':'😆' };
 const PICKER = ['😊','😄','😂','😉','😛','😮','😢','😎','😘','❤️','👍','🎵','☕','🌟','🔥','😴'];
+const YAHOO_ICONS = { ':)':'happy', ':-)':'happy', ':(':'sad', ':-(':'sad', ';)':'wink', ';-)':'wink', ':D':'big-grin', ':-D':'big-grin',
+  ':P':'tongue', ':p':'tongue', ':-P':'tongue', ':">':'blushing', ':-*':'kiss', ':O':'surprise', ':o':'surprise', 'B-)':'cool', 'X(':'angry',
+  ':((':'crying', ':))':'laughing', ':|':'straight-face', ':-/':'confused', ':-S':'worried', '>:)':'devil', 'O:)':'angel', ':-B':'nerd',
+  'I-)':'sleepy', '8-|':'rolling-eyes', ':X':'love-struck', '$-)':'money-eyes', ':-&':'sick', '>:D<':'big-hug', ';;)':'batting-eyelashes', ':>':'smug' };
+const ICON_CODES = [':)',':(', ';)',':D',':P',':">',':-*',':O','B-)','X(',':((',':))',':|',':-/',':-S','>:)','O:)',':-B','I-)','8-|',':X','$-)',':-&','>:D<',';;)',':>'];
 const AVATARS = ['😊','😎','🥰','😺','🐶','🦊','🐼','🤠','👻','🌸'];
 let myNick = '', myAvatar = localStorage.getItem('yahoo_avatar') || '😊';
 let users = [], rooms = [];
@@ -208,6 +216,13 @@ function unreadBadge(key) { const n = unread.get(key) || 0; if (!n) return null;
 
 // ---------- cửa sổ chat ----------
 function fmt(text) { let t = text; Object.keys(EMOS).sort((a,b) => b.length - a.length).forEach(k => { t = t.split(k).join(EMOS[k]); }); return t; }
+const ICON_REGEX = new RegExp('(' + Object.keys(YAHOO_ICONS).sort((a,b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'g');
+function renderRich(el, text) {
+  text.split(ICON_REGEX).forEach(part => {
+    if (YAHOO_ICONS[part]) { const im = document.createElement('img'); im.src = '/emoticons/' + YAHOO_ICONS[part] + '.png'; im.className = 'emo'; im.alt = part; im.title = part; el.appendChild(im); }
+    else if (part) el.appendChild(document.createTextNode(fmt(part)));
+  });
+}
 function timeStr(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
 
 function openWindow(type, id, title) {
@@ -228,7 +243,8 @@ function openWindow(type, id, title) {
   windows.set(key, w);
   win.querySelector('.close').onclick = () => { windows.delete(key); win.remove(); };
   const picker = win.querySelector('.emopicker');
-  PICKER.forEach(e => { const s = document.createElement('span'); s.textContent = e; s.onclick = () => { w.input.value += e; w.input.focus(); }; picker.appendChild(s); });
+  ICON_CODES.forEach(code => { const im = document.createElement('img'); im.src = '/emoticons/' + YAHOO_ICONS[code] + '.png'; im.title = code; im.alt = code;
+    im.onclick = () => { w.input.value += ' ' + code + ' '; w.input.focus(); }; picker.appendChild(im); });
   win.querySelector('.emoBtn').onclick = () => picker.classList.toggle('open');
   const send = () => { const text = w.input.value.trim(); if (!text) return; w.input.value = '';
     socket.emit('typing', { room: type === 'room' ? id : undefined, to: type === 'pm' ? id : undefined, typing: false });
@@ -245,7 +261,7 @@ function bumpUnread(key) { unread.set(key, (unread.get(key) || 0) + 1); renderBu
 function addMsg(w, m) { const d = document.createElement('div'); d.className = 'msg';
   d.innerHTML = '<span class="who ' + (m.from === myNick ? 'me' : 'other') + '"></span><span class="time"></span>: <span class="txt"></span>';
   d.querySelector('.who').textContent = m.avatar + ' ' + m.from; d.querySelector('.time').textContent = '(' + timeStr(m.time) + ')';
-  d.querySelector('.txt').textContent = fmt(m.text); w.msgs.appendChild(d); w.msgs.scrollTop = w.msgs.scrollHeight; }
+  renderRich(d.querySelector('.txt'), m.text); w.msgs.appendChild(d); w.msgs.scrollTop = w.msgs.scrollHeight; }
 function addSys(w, text) { const d = document.createElement('div'); d.className = 'msg sys'; d.textContent = text; w.msgs.appendChild(d); w.msgs.scrollTop = w.msgs.scrollHeight; }
 function addBuzzMsg(w, from) { const d = document.createElement('div'); d.className = 'msg buzzmsg'; d.textContent = '⚡ ' + from + ' vừa gửi BUZZ!!! ⚡'; w.msgs.appendChild(d); w.msgs.scrollTop = w.msgs.scrollHeight; }
 function doBuzz(w, from) { addBuzzMsg(w, from); w.el.classList.remove('shaking'); void w.el.offsetWidth; w.el.classList.add('shaking'); buzzSound(); }
