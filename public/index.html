@@ -82,9 +82,9 @@
   .emopicker { display: none; padding: 6px; background: #fff; border-top: 1px solid #ccc; flex-wrap: wrap; gap: 2px; }
   .emopicker.open { display: flex; }
   .emopicker span { font-size: 19px; cursor: pointer; padding: 2px; }
-  .emopicker img { width: 30px; height: 30px; cursor: pointer; padding: 2px; border-radius: 4px; }
+  .emopicker img { height: 28px; width: auto; max-width: 46px; cursor: pointer; padding: 3px; border-radius: 4px; }
   .emopicker img:hover { background: #d1c4e9; }
-  .msg .txt img.emo { width: 22px; height: 22px; vertical-align: -5px; }
+  .msg .txt img.emo { height: 22px; width: auto; max-width: 40px; vertical-align: -6px; }
   @keyframes shake { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-8px,3px)} 20%{transform:translate(7px,-4px)}
     30%{transform:translate(-6px,-3px)} 40%{transform:translate(6px,4px)} 50%{transform:translate(-5px,2px)}
     60%{transform:translate(5px,-2px)} 70%{transform:translate(-4px,1px)} 80%{transform:translate(4px,-1px)} 90%{transform:translate(-2px,0)} }
@@ -138,11 +138,8 @@
 <script>
 const EMOS = { ':)':'😊', ':-)':'😊', ':(':'😞', ':D':'😄', ';)':'😉', ':P':'😛', ':p':'😛', ':o':'😮', ':O':'😮', '<3':'❤️', ':*':'😘', ":'(":'😢', 'B-)':'😎', ':|':'😐', '>:(':'😠', '^^':'😆' };
 const PICKER = ['😊','😄','😂','😉','😛','😮','😢','😎','😘','❤️','👍','🎵','☕','🌟','🔥','😴'];
-const YAHOO_ICONS = { ':)':'happy', ':-)':'happy', ':(':'sad', ':-(':'sad', ';)':'wink', ';-)':'wink', ':D':'big-grin', ':-D':'big-grin',
-  ':P':'tongue', ':p':'tongue', ':-P':'tongue', ':">':'blushing', ':-*':'kiss', ':O':'surprise', ':o':'surprise', 'B-)':'cool', 'X(':'angry',
-  ':((':'crying', ':))':'laughing', ':|':'straight-face', ':-/':'confused', ':-S':'worried', '>:)':'devil', 'O:)':'angel', ':-B':'nerd',
-  'I-)':'sleepy', '8-|':'rolling-eyes', ':X':'love-struck', '$-)':'money-eyes', ':-&':'sick', '>:D<':'big-hug', ';;)':'batting-eyelashes', ':>':'smug' };
-const ICON_CODES = [':)',':(', ';)',':D',':P',':">',':-*',':O','B-)','X(',':((',':))',':|',':-/',':-S','>:)','O:)',':-B','I-)','8-|',':X','$-)',':-&','>:D<',';;)',':>'];
+const YAHOO_ICONS = { ">:D<":"6.gif", ">:d<":"6.gif", "#:-S":"18.gif", "#:-s":"18.gif", ":-))":"21.gif", "O:-)":"25.gif", "o:-)":"25.gif", "0:-)":"25.gif", "<:-P":"36.gif", "<:-p":"36.gif", ":-SS":"42.gif", ":-Ss":"42.gif", ":-sS":"42.gif", ":-ss":"42.gif", "<):)":"48.gif", "3:-O":"50.gif", "3:-o":"50.gif", ":(|)":"51.gif", "@};-":"53.gif", "**==":"55.gif", "(~~)":"56.gif", "*-:)":"58.gif", "[-o<":"63.gif", "[-O<":"63.gif", ":)>-":"67.gif", "\\:D/":"69.gif", "\\:d/":"69.gif", "^:)^":"77.gif", ":-??":"106.gif", ":-)":"1.gif", ":-(":"2.gif", ";-)":"3.gif", ":-D":"4.gif", ":-d":"4.gif", ";;)":"5.gif", ":-/":"7.gif", ":-\\":"7.gif", ":-x":"8.gif", ":-X":"8.gif", ":\">":"9.gif", ":-P":"10.gif", ":-p":"10.gif", ":-*":"11.gif", "=((":"12.gif", ":-O":"13.gif", ":-o":"13.gif", "X-(":"14.gif", "x-(":"14.gif", ":->":"15.gif", "B-)":"16.gif", "b-)":"16.gif", ":-S":"17.gif", ":-s":"17.gif", ">:)":"19.gif", ":((":"20.gif", ":))":"21.gif", ":-|":"22.gif", "/:)":"23.gif", "=))":"24.gif", "0:)":"25.gif", ":-B":"26.gif", ":-b":"26.gif", "I-)":"28.gif", "i-)":"28.gif", "|-)":"28.gif", "8-|":"29.gif", "L-)":"30.gif", "l-)":"30.gif", ":-&":"31.gif", ":-$":"32.gif", "[-(":"33.gif", ":o)":"34.gif", ":O)":"34.gif", "8-}":"35.gif", "(:|":"37.gif", "=P~":"38.gif", "=p~":"38.gif", ":-?":"39.gif", "#-o":"40.gif", "#-O":"40.gif", "=D>":"41.gif", "=d>":"41.gif", "@-)":"43.gif", ":^O":"44.gif", ":^o":"44.gif", ":-w":"45.gif", ":-W":"45.gif", ":-<":"46.gif", ">:P":"47.gif", ">:p":"47.gif", ":@)":"49.gif", "~:>":"52.gif", "%%-":"54.gif", "~o)":"57.gif", "~O)":"57.gif", "8-X":"59.gif", "8-x":"59.gif", "=:)":"60.gif", ">-)":"61.gif", ":-L":"62.gif", ":-l":"62.gif", "$-)":"64.gif", ":-\"":"65.gif", "b-(":"66.gif", "B-(":"66.gif", "[-X":"68.gif", "[-x":"68.gif", ">:/":"70.gif", ";))":"71.gif", "o->":"72.gif", "O->":"72.gif", "o=>":"73.gif", "O=>":"73.gif", "o-+":"74.gif", "O-+":"74.gif", "(%)":"75.gif", ":-@":"76.gif", ":-j":"78.gif", ":-J":"78.gif", "(*)":"79.gif", ":)]":"100.gif", ":-c":"101.gif", "~x(":"102.gif", "~X(":"102.gif", ":-h":"103.gif", ":-t":"104.gif", ":-T":"104.gif", "8->":"105.gif", "%-(":"107.gif", ":O3":"108.gif", ":o3":"108.gif", "O:)":"25.gif", ":)":"1.gif", ":(":"2.gif", ";)":"3.gif", ":D":"4.gif", ":d":"4.gif", ":x":"8.gif", ":X":"8.gif", ":P":"10.gif", ":p":"10.gif", ":*":"11.gif", ":O":"13.gif", ":o":"13.gif", "X(":"14.gif", "x(":"14.gif", ":>":"15.gif", ":|":"22.gif", "=;":"27.gif" };
+const ICON_CODES = [":)", ":(", ";)", ":D", ";;)", ">:D<", ":-/", ":x", ":\">", ":-P", ":-*", "=((", ":-O", "X-(", ":->", "B-)", ":-S", "#:-S", ">:)", ":((", ":))", ":|", "/:)", "=))", "O:-)", ":-B", "=;", "I-)", "8-|", "L-)", ":-&", ":-$", "[-(", ":o)", "8-}", "<:-P", "(:|", "=P~", ":-?", "#-o", "=D>", ":-SS", "@-)", ":^O", ":-w", ":-<", ">:P", "<):)", ":@)", "3:-O", ":(|)", "~:>", "@};-", "%%-", "**==", "(~~)", "~o)", "*-:)", "8-X", "=:)", ">-)", ":-L", "[-o<", "$-)", ":-\"", "b-(", ":)>-", "[-X", "\\:D/", ">:/", ";))", "o->", "o=>", "o-+", "(%)", ":-@", "^:)^", ":-j", "(*)", ":)]", ":-c", "~x(", ":-h", ":-t", "8->", ":-??", "%-(", ":O3"];)',':D',':P',':">',':-*',':O','B-)','X(',':((',':))',':|',':-/',':-S','>:)','O:)',':-B','I-)','8-|',':X','$-)',':-&','>:D<',';;)',':>'];
 const AVATARS = ['😊','😎','🥰','😺','🐶','🦊','🐼','🤠','👻','🌸'];
 let myNick = '', myAvatar = localStorage.getItem('yahoo_avatar') || '😊';
 let users = [], rooms = [];
@@ -219,7 +216,7 @@ function fmt(text) { let t = text; Object.keys(EMOS).sort((a,b) => b.length - a.
 const ICON_REGEX = new RegExp('(' + Object.keys(YAHOO_ICONS).sort((a,b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'g');
 function renderRich(el, text) {
   text.split(ICON_REGEX).forEach(part => {
-    if (YAHOO_ICONS[part]) { const im = document.createElement('img'); im.src = '/emoticons/' + YAHOO_ICONS[part] + '.png'; im.className = 'emo'; im.alt = part; im.title = part; el.appendChild(im); }
+    if (YAHOO_ICONS[part]) { const im = document.createElement('img'); im.src = '/emoticons/' + YAHOO_ICONS[part]; im.className = 'emo'; im.alt = part; im.title = part; el.appendChild(im); }
     else if (part) el.appendChild(document.createTextNode(fmt(part)));
   });
 }
@@ -243,7 +240,7 @@ function openWindow(type, id, title) {
   windows.set(key, w);
   win.querySelector('.close').onclick = () => { windows.delete(key); win.remove(); };
   const picker = win.querySelector('.emopicker');
-  ICON_CODES.forEach(code => { const im = document.createElement('img'); im.src = '/emoticons/' + YAHOO_ICONS[code] + '.png'; im.title = code; im.alt = code;
+  ICON_CODES.forEach(code => { const im = document.createElement('img'); im.src = '/emoticons/' + YAHOO_ICONS[code]; im.title = code; im.alt = code;
     im.onclick = () => { w.input.value += ' ' + code + ' '; w.input.focus(); }; picker.appendChild(im); });
   win.querySelector('.emoBtn').onclick = () => picker.classList.toggle('open');
   const send = () => { const text = w.input.value.trim(); if (!text) return; w.input.value = '';

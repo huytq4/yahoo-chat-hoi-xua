@@ -1,6 +1,6 @@
 // Service worker tối giản: giúp app cài được như ứng dụng (PWA).
 // Chat là thời gian thực nên luôn ưu tiên mạng; SW chỉ giữ bản dự phòng của vỏ app.
-const CACHE = 'yahoo-chat-xua-v2';
+const CACHE = 'yahoo-chat-xua-v3';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
